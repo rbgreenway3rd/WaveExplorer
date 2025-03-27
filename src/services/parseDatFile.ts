@@ -239,14 +239,15 @@ export async function extractAllData(content: string): Promise<Project> {
   const wells: Well[] = [];
   for (let row = 0; row < extractedRows; row++) {
     for (let col = 0; col < extractedColumns; col++) {
-      const wellId = `${row}-${col}`;
-      const wellKey = `${row}-${col}`;
-      const wellLabel = `${String.fromCharCode(65 + row)}${col + 1}`;
+     const wellId = row * extractedColumns + col; // Unique integer ID
+      const wellKey = `${row}-${col}`; // Keep as key if needed
+      const wellLabel = `${String.fromCharCode(65 + row)}${col + 1}`; // e.g., A1, B2
       const well = new Well(wellId, wellKey, wellLabel, col, row);
       wells.push(well);
     }
-  }
+}
 
+let indicatorId = 0;
   // Create Indicator instances and assign to wells
   extractedIndicators.forEach((indicatorInfo) => {
     const indicatorName = indicatorInfo.indicatorName;
@@ -260,7 +261,7 @@ export async function extractAllData(content: string): Promise<Project> {
       const end = start + pointsPerWell;
       const wellData = dataPoints.slice(start, end);
       const indicator = new Indicator(
-        `${indicatorInfo.id}-${well.id}`,
+        indicatorId++,
         indicatorName,
         wellData,
         [...wellData], // Copy for filteredData

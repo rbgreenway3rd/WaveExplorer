@@ -64,14 +64,14 @@ export class Experiment {
 }
 
 export class Well {
-  id: string;
+  id: number;
   key: string;
   label: string;
   column: number;
   row: number;
   indicators: Indicator[];
 
-  constructor(id: string, key: string, label: string, column: number, row: number) {
+  constructor(id: number, key: string, label: string, column: number, row: number) {
     this.id = id;
     this.key = key;
     this.label = label;
@@ -82,7 +82,7 @@ export class Well {
 }
 
 export class Indicator {
-  id: string;
+  id: number;
   indicatorName: string;
   rawData: number[];
   filteredData: number[];
@@ -91,7 +91,7 @@ export class Indicator {
   analyses: [];
 
   constructor(
-    id: string,
+    id: number,
     indicatorName: string,
     rawData: number[],
     filteredData: number[],
