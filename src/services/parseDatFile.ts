@@ -239,24 +239,23 @@ export async function extractAllData(content: string): Promise<Project> {
   const wells: Well[] = [];
   for (let row = 0; row < extractedRows; row++) {
     for (let col = 0; col < extractedColumns; col++) {
-     const wellId = row * extractedColumns + col; // Unique integer ID
+      const wellId = row * extractedColumns + col; // Unique integer ID
       const wellKey = `${row}-${col}`; // Keep as key if needed
       const wellLabel = `${String.fromCharCode(65 + row)}${col + 1}`; // e.g., A1, B2
       const well = new Well(wellId, wellKey, wellLabel, col, row);
       wells.push(well);
     }
-}
+  }
 
-let indicatorId = 0;
   // Create Indicator instances and assign to wells
-  extractedIndicators.forEach((indicatorInfo) => {
-    const indicatorName = indicatorInfo.indicatorName;
-    const times = indicatorTimes[indicatorName];
-    const dataPoints = analysisData[indicatorName];
-    const wellCount = extractedRows * extractedColumns;
-    const pointsPerWell = dataPoints.length / wellCount;
-
-    wells.forEach((well, wellIndex) => {
+  let indicatorId = 0;
+  wells.forEach((well, wellIndex) => {
+    extractedIndicators.forEach((indicatorInfo) => {
+      const indicatorName = indicatorInfo.indicatorName;
+      const times = indicatorTimes[indicatorName];
+      const dataPoints = analysisData[indicatorName];
+      const wellCount = extractedRows * extractedColumns;
+      const pointsPerWell = dataPoints.length / wellCount;
       const start = wellIndex * pointsPerWell;
       const end = start + pointsPerWell;
       const wellData = dataPoints.slice(start, end);
@@ -264,7 +263,7 @@ let indicatorId = 0;
         indicatorId++,
         indicatorName,
         wellData,
-        [...wellData], // Copy for filteredData
+        [...wellData],
         times,
         false,
         []

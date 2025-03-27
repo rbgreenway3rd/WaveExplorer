@@ -3,6 +3,7 @@ import { useState } from "react";
 import { handleDatFileSelect } from "./utils/handlers/handleDatFileSelect";
 import { extractAllData } from "./services/parseDatFile";
 import { Project } from "./Models"
+import MinigraphGrid from "./components/MinigraphGrid";
 
 const App = () => {
   const [fileType, setFileType] = useState<string | null>(null);
@@ -29,34 +30,17 @@ const App = () => {
     <div>
       <input type="file" onChange={onFileChange} />
       {dataExtracted && (
-        <div>
-          <h2>Project: {project?.title}</h2>
-          <p>Date: {project?.date}</p>
-          <p>Time: {project?.time}</p>
-          <p>Instrument: {project?.instrument}</p>
-          <p>Protocol: {project?.protocol}</p>
-          <h3>Plates:</h3>
-          {project?.plate.map((plate, index) => (
-            <div key={index}>
-              <h4>Plate {index + 1}</h4>
-              <p>Number of Rows: {plate.numberOfRows}</p>
-              <p>Number of Columns: {plate.numberOfColumns}</p>
-              <p>Assay Plate Barcode: {plate.assayPlateBarcode}</p>
-              <p>Add Plate Barcode: {plate.addPlateBarcode}</p>
-              <h5>Experiments:</h5>
-              {plate.experiments.map((experiment, index) => (
-                <div key={index}>
-                  <h6>Experiment {index + 1}</h6>
-                  <p>Binning: {experiment.binning}</p>
-                  <p>Number of Rows: {experiment.numberOfRows}</p>
-                  <p>Number of Columns: {experiment.numberOfColumns}</p>
-                  <p>Operator: {experiment.operator}</p>
-                </div>
-              ))}
-              
-        </div>
-      ))}
+        
+    <div>
+      <MinigraphGrid
+        wells={project?.plate[0]?.experiments[0]?.wells || []}
+        rows={project?.plate[0]?.numberOfRows || 0}
+        columns={project?.plate[0]?.numberOfColumns || 0}
+        onToggleWell={(wellId: string) => console.log(`Toggled well: ${wellId}`)}
+        />
     </div>
+    
+      
     )  
 };
 </div>
