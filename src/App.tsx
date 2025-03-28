@@ -1,25 +1,54 @@
-// Assuming React with TypeScript
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { handleDatFileSelect } from "./utils/handlers/handleDatFileSelect";
 import { extractAllData } from "./services/parseDatFile";
-import { Project } from "./Models"
-import MinigraphGrid from "./components/MinigraphGrid";
+import { RootState } from "./state/Store";
+import {
+  setProject,
+  setFileType,
+  setTimeArray,
+  setAllYValues,
+} from "./state/slices/projectSlice";
+import MinigraphGrid from "./components/MinigraphGrid/MinigraphGrid";
 
 const App = () => {
-  const [fileType, setFileType] = useState<string | null>(null);
-  const [dataExtracted, setDataExtracted] = useState(false);
-  const [project, setProject] = useState<Project | null>(null);
+  const dispatch = useDispatch();
+  const { project, dataExtracted } = useSelector(
+    (state: RootState) => state.project
+  );
 
+  // const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (file) {
+  //     try {
+  //       const fileContent = await handleDatFileSelect(file);
+  //       const extractedProject = await extractAllData(fileContent);
+
+  //       // Dispatch the project and file type
+  //       dispatch(setProject(extractedProject.project));
+  //       dispatch(setFileType("dat"));
+
+  //       // Dispatch the timeArray (indicatorTimes)
+  //       const timeArray = extractedProject.project.plate[0].experiments[0].wells[0].indicators[0].time; // Ensure `time` is returned as a number[]
+  //       dispatch(setTimeArray({ default: timeArray }));
+  //       // dispatch(setAllYValues({allYValues})); // Ensure `analysisData` is returned as a number[]
+  //     } catch (error) {
+  //       console.error("Error processing file:", error);
+  //     }
+  //   }
+  // };
   const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
         const fileContent = await handleDatFileSelect(file);
-        const extractedProject = await extractAllData(fileContent);
-        setProject(extractedProject);
-        setFileType("dat");
-        setDataExtracted(true);
-        console.log(extractedProject)
+        const { project, timeArray, allYValues } = await extractAllData(
+          fileContent
+        );
+
+        // Dispatch the project, timeArray, and allYValues to Redux
+        dispatch(setProject(project));
+        dispatch(setTimeArray(timeArray));
+        dispatch(setAllYValues(allYValues));
       } catch (error) {
         console.error("Error processing file:", error);
       }
@@ -29,21 +58,18 @@ const App = () => {
   return (
     <div>
       <input type="file" onChange={onFileChange} />
-      {dataExtracted && (
-        
-    <div>
-      <MinigraphGrid
-        wells={project?.plate[0]?.experiments[0]?.wells || []}
-        rows={project?.plate[0]?.numberOfRows || 0}
-        columns={project?.plate[0]?.numberOfColumns || 0}
-        onToggleWell={(wellId: string) => console.log(`Toggled well: ${wellId}`)}
+      {dataExtracted && project && (
+        <MinigraphGrid
+          wells={project.plate[0]?.experiments[0]?.wells || []}
+          rows={project.plate[0]?.numberOfRows || 0}
+          columns={project.plate[0]?.numberOfColumns || 0}
+          onToggleWell={(wellId: number) =>
+            console.log(`Toggled well: ${wellId}`)
+          }
         />
+      )}
     </div>
-    
-      
-    )  
+  );
 };
-</div>
-);}
 
 export default App;

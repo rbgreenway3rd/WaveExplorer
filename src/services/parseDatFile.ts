@@ -1,4 +1,11 @@
-import { Project, Plate, Experiment, Well, Indicator, IndicatorConfig } from "../Models"
+import {
+  Project,
+  Plate,
+  Experiment,
+  Well,
+  Indicator,
+  IndicatorConfig,
+} from "../Models";
 
 const extractProjectTitle = (content: string): string => {
   const lines = content.split("\n");
@@ -66,7 +73,10 @@ const extractOperator = (content: string): string[] => {
   const endIndex = lines.findIndex((line) => line.includes("Project"));
   if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
     const operatorLine = lines[startIndex + 1];
-    return operatorLine.split("\t").slice(1).map((part) => part.trim());
+    return operatorLine
+      .split("\t")
+      .slice(1)
+      .map((part) => part.trim());
   }
   return [];
 };
@@ -156,7 +166,10 @@ const extractIndicatorTimes = (
   extractedLinesByIndicator: Record<string, string[]>,
   extractedRows: number,
   extractedColumns: number
-): { indicatorTimes: Record<string, number[]>; analysisData: Record<string, number[]> } => {
+): {
+  indicatorTimes: Record<string, number[]>;
+  analysisData: Record<string, number[]>;
+} => {
   const indicatorTimes: Record<string, number[]> = {};
   const analysisData: Record<string, number[]> = {};
 
@@ -184,8 +197,11 @@ const extractIndicatorTimes = (
 
   return { indicatorTimes, analysisData };
 };
-
-export async function extractAllData(content: string): Promise<Project> {
+export async function extractAllData(content: string): Promise<{
+  project: Project;
+  timeArray: Record<string, number[]>;
+  allYValues: Record<string, number[]>;
+}> {
   // Extract metadata
   const extractedRows = extractNumberOfRows(content);
   const extractedColumns = extractNumberOfColumns(content);
@@ -197,7 +213,8 @@ export async function extractAllData(content: string): Promise<Project> {
   const extractedAssayPlateBarcode = extractAssayPlateBarcode(content);
   const extractedAddPlateBarcode = extractAddPlateBarcode(content);
   const extractedBinning = extractBinning(content);
-  const extractedIndicatorConfigurations = extractIndicatorConfigurations(content);
+  const extractedIndicatorConfigurations =
+    extractIndicatorConfigurations(content);
   const extractedOperator = extractOperator(content);
 
   // Extract indicator data
@@ -208,6 +225,8 @@ export async function extractAllData(content: string): Promise<Project> {
     extractedRows,
     extractedColumns
   );
+
+  //   console.log(indicatorTimes)
 
   // Create Project instance
   const project = new Project(
@@ -277,5 +296,5 @@ export async function extractAllData(content: string): Promise<Project> {
   plate.experiments.push(experiment);
   project.plate.push(plate);
 
-  return project;
+  return { project, timeArray: indicatorTimes, allYValues: analysisData };
 }

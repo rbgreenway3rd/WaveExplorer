@@ -6,7 +6,13 @@ export class Project {
   protocol: string;
   plate: Plate[];
 
-  constructor(title: string, date: string, time: string, instrument: string, protocol: string) {
+  constructor(
+    title: string,
+    date: string,
+    time: string,
+    instrument: string,
+    protocol: string
+  ) {
     this.title = title;
     this.date = date;
     this.time = time;
@@ -71,7 +77,13 @@ export class Well {
   row: number;
   indicators: Indicator[];
 
-  constructor(id: number, key: string, label: string, column: number, row: number) {
+  constructor(
+    id: number,
+    key: string,
+    label: string,
+    column: number,
+    row: number
+  ) {
     this.id = id;
     this.key = key;
     this.label = label;
@@ -97,7 +109,7 @@ export class Indicator {
     filteredData: number[],
     time: number[],
     isDisplayed: boolean,
-    analyses: [],
+    analyses: []
   ) {
     this.id = id;
     this.indicatorName = indicatorName;
