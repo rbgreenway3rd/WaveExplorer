@@ -1,5 +1,59 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Project } from "../../Models";
+import { createSelector } from "reselect";
+import { RootState } from "../Store";
+
+// Base selectors
+const selectProjectState = (state: RootState) => state.project;
+const selectSelectedGraphs = (state: RootState) => state.project.selectedGraphs;
+
+// Memoized selector for graph data
+export const selectGraphData = createSelector(
+  [selectProjectState, selectSelectedGraphs],
+  (projectState, selectedGraphs) => {
+    const { project, timeArray } = projectState;
+
+    if (!project || !timeArray || selectedGraphs.length === 0) return null;
+
+    // Cache wells for faster lookup
+    const wellsMap = new Map(
+      project.plate[0]?.experiments[0]?.wells.map((well) => [well.id, well])
+    );
+
+    const datasets = selectedGraphs.map((wellId) => {
+      const well = wellsMap.get(wellId);
+
+      if (!well || well.indicators.length === 0) {
+        return {
+          label: `Well ${wellId}`,
+          data: [],
+          borderColor: "rgba(200, 200, 200, 1)",
+          backgroundColor: "rgba(0, 0, 0, 0)",
+          borderWidth: 1,
+        };
+      }
+
+      const indicator = well.indicators[0];
+      return {
+        label: well.label,
+        data: indicator.rawData,
+        borderColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+          Math.random() * 255
+        }, 1)`,
+        backgroundColor: "rgba(0, 0, 0, 0)",
+        borderWidth: 1,
+      };
+    });
+
+    const timeKeys = Object.keys(timeArray);
+    const labels = timeKeys.length > 0 ? timeArray[timeKeys[0]] : [];
+
+    return {
+      labels,
+      datasets,
+    };
+  }
+);
 
 interface ProjectState {
   project: Project | null;

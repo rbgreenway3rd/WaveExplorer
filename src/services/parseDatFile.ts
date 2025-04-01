@@ -296,5 +296,9 @@ export async function extractAllData(content: string): Promise<{
   plate.experiments.push(experiment);
   project.plate.push(plate);
 
-  return { project, timeArray: indicatorTimes, allYValues: analysisData };
+  return {
+    project: project,
+    timeArray: indicatorTimes,
+    allYValues: analysisData,
+  };
 }

@@ -13,7 +13,7 @@ import {
 } from "chart.js";
 import { Well } from "../../Models";
 import "chartjs-adapter-date-fns"; // adapter for x-scale - "time scale"
-import { minigraphOptions } from "./minigraphOptions";
+
 import { useSelector } from "react-redux";
 import { RootState } from "../../state/Store";
 import { useDispatch } from "react-redux";
@@ -82,7 +82,6 @@ export const MinigraphGrid: React.FC<MinigraphGridProps> = ({
         <Line
           key={well.id}
           onClick={() => {
-            dispatch(addSelectedGraph(well.id)); // Dispatch action to add graph to selectedGraphs
             onToggleWell(well.id); // Call the provided onToggleWell function
             // console.log(selectedGraphs);
           }}
@@ -105,9 +104,12 @@ export const MinigraphGrid: React.FC<MinigraphGridProps> = ({
             ],
           }}
           options={{
+            normalized: true,
             maintainAspectRatio: true,
             responsive: true,
+            devicePixelRatio: window.devicePixelRatio || 1,
             spanGaps: false,
+            // parsing: false,
             plugins: {
               legend: { display: false },
               decimation: {
@@ -127,7 +129,7 @@ export const MinigraphGrid: React.FC<MinigraphGridProps> = ({
                 radius: 0,
               },
               line: {
-                borderWidth: 1.5,
+                borderWidth: 1,
               },
             },
             layout: {
