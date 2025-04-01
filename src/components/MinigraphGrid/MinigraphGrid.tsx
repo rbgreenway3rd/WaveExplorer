@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../state/Store";
 import { useDispatch } from "react-redux";
 import { addSelectedGraph } from "../../state/slices/projectSlice";
+import "./MinigraphGrid.css";
 
 // Register Chart.js components
 ChartJS.register(...registerables);
@@ -47,9 +48,11 @@ export const MinigraphGrid: React.FC<MinigraphGridProps> = ({
     display: "grid",
     gridTemplateRows: `repeat(${rows}, ${cellHeight}px)`,
     gridTemplateColumns: `repeat(${columns}, ${cellHeight * 1.5}px)`,
-    gap: "0px", // Adjust the gap between grid items as needed
+    gap: "0.25em", // Adjust the gap between grid items as needed
     overflow: "auto", // Add scrollbars if the content overflows
-    margin: "0 auto", // Center the container horizontally
+    // margin: "0 auto", // Center the container horizontally
+    backgroundColor: "grey",
+    // padding: "0.5em", // Add padding around the grid`
   };
 
   const timeArray = useSelector((state: RootState) => state.project.timeArray);
@@ -80,13 +83,14 @@ export const MinigraphGrid: React.FC<MinigraphGridProps> = ({
     <div style={gridStyle}>
       {transposedWells.map((well) => (
         <Line
+          className="minigraph-canvas"
           key={well.id}
           onClick={() => {
             onToggleWell(well.id); // Call the provided onToggleWell function
             // console.log(selectedGraphs);
           }}
           style={{
-            border: "1px solid #ccc",
+            // border: "2px solid rgb(120, 120, 120)",
             width: "100%",
             height: "100%",
             maxWidth: cellWidth,
@@ -97,9 +101,13 @@ export const MinigraphGrid: React.FC<MinigraphGridProps> = ({
             datasets: [
               {
                 label: well.label,
-                data: well.indicators[0]?.rawData || [], // Use optional chaining to avoid runtime errors
-                borderColor: "rgba(75, 192, 192, 1)",
-                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                // data: well.indicators[0]?.rawData || [], // Use optional chaining to avoid runtime errors
+                data:
+                  well.indicators[0]?.time.map((time, index) => ({
+                    x: time, // Time value for the x-axis
+                    y: well.indicators[0]?.rawData[index], // Corresponding y value
+                  })) || [], // Ensure data is in the correct format
+                borderColor: "rgb(75, 192, 192)",
               },
             ],
           }}
@@ -109,7 +117,7 @@ export const MinigraphGrid: React.FC<MinigraphGridProps> = ({
             responsive: true,
             devicePixelRatio: window.devicePixelRatio || 1,
             spanGaps: false,
-            // parsing: false,
+            parsing: false, // parsing done manually in 'data' configuration within Line element
             plugins: {
               legend: { display: false },
               decimation: {
@@ -129,7 +137,7 @@ export const MinigraphGrid: React.FC<MinigraphGridProps> = ({
                 radius: 0,
               },
               line: {
-                borderWidth: 1,
+                borderWidth: 1.5,
               },
             },
             layout: {
